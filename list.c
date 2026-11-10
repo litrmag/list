@@ -49,11 +49,6 @@ bool ExpandSize (Array* arr);
 bool GetSize (Array* array, size_t* size);
 int GetElementUnsecure (List* list, DataType dt, size_t index);
 
-size_t FastAddToList (List* list, size_t index, int value);
-size_t FastDeleteFromList (List* list, size_t index);
-bool FastUpdateList (List* list, size_t index, int value);
-bool FastGetElementFromList (List* list, size_t index, int* value);
-
 int main ()
 {
     List* list = (List*)calloc(1, sizeof(List));
@@ -399,60 +394,6 @@ int GetElementUnsecure (List* list, DataType dt, size_t index)
         exit (1);
 }
 
-size_t FastAddToList (List* list, size_t index, int value) //TODO доделать эти быстрые функции
-{
-    assert (list);
-    if (list->next_free == -1)
-    {
-        size_t size_list_elements = 0;
-        GetSize (list->data, &size_list_elements);
 
-        PushBack (list, (ListElement){-1, -1, -1});
-    }
-    int index_prev_element = index;
 
-    int index_next_element = 0;
-    GetElement (list, NEXT, index_prev_element, &index_next_element);
-    int index_current_element = list->next_free;
 
-    SetElement (list, PREV, index_current_element, index_prev_element);
-    GetElement (list, NEXT, index_current_element, &(list->next_free));
-    SetElement (list, NEXT, index_current_element, index_next_element);
-    SetElement (list, ELEMENTS, index_current_element, value);
-
-    SetElement (list, PREV, index_next_element, index_current_element);
-    SetElement (list, NEXT, index_prev_element, index_current_element);
-
-    (list->size_list)++;
-    return index_current_element;
-}
-
-size_t FastDeleteFromList (List* list, size_t index)
-{
-    assert (list);
-    int index_prev_element = 0;
-    GetElement (list, PREV, index, &index_prev_element);
-    int index_next_element = 0;
-    GetElement (list, NEXT, index, &index_next_element);
-
-    SetElement (list, PREV, index_next_element, index_prev_element);
-    SetElement (list, NEXT, index_prev_element, index_next_element);
-
-    SetElement (list, NEXT, index, list->next_free);
-    list->next_free = index;
-    SetElement (list, ELEMENTS, index, -1);
-    SetElement (list, PREV, index, -1);
-
-    (list->size_list)--;
-    return index_next_element;
-}
-
-bool FastUpdateList (List* list, size_t index, int value)
-{
-    return SetElement (list, ELEMENTS, index, value);
-}
-
-bool FastGetElementFromList (List* list, size_t index, int* value)
-{
-    return GetElement (list, ELEMENTS, index, value);
-}
